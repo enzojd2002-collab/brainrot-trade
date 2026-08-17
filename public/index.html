@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brainrot Trade</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #090a10;
+      color: white;
+      padding-bottom: 80px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #121522;
+      border-bottom: 1px solid #2c3348;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .logo span {
+      color: #c64cff;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 15px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+      background: #9b42ff;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    .dark {
+      background: #252b3d;
+    }
+
+    .gold {
+      background: #d49a20;
+      color: #160f00;
+    }
+
+    .danger {
+      background: #551c29;
+      color: #ffb7c2;
+    }
+
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 16px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 13px;
+      margin: 7px 0 12px;
+      border-radius: 12px;
+      border: 1px solid #343c55;
+      background: #111522;
+      color: white;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .search {
+      margin-bottom: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .card {
+      background: #141927;
+      border: 1px solid #303851;
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .card h2 {
+      margin: 10px 0 5px;
+    }
+
+    .photo {
+      width: 100%;
+      height: 180px;
+      background: #20273a;
+      border-radius: 13px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      font-size: 55px;
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .muted {
+      color: #929ab0;
+      font-size: 13px;
+    }
+
+    .certified {
+      color: #ffd34f;
+      font-weight: bold;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      background: #111522;
+      border-top: 1px solid #30374c;
+      padding: 9px;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 30;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .box {
+      width: min(650px, 100%);
+      max-height: 92vh;
+      overflow-y: auto;
+      background: #151a29;
+      border: 1px solid #3c4663;
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .messages {
+      height: 55vh;
+      min-height: 300px;
+      overflow-y: auto;
+      background: #0c1019;
+      border-radius: 15px;
+      padding: 12px;
+    }
+
+    .message {
+      max-width: 78%;
+      padding: 10px 13px;
+      margin: 8px 0;
+      background: #252c40;
+      border-radius: 15px;
+      word-break: break-word;
+    }
+
+    .message.mine {
+      margin-left: auto;
+      background: #65319a;
+    }
+
+    .message-name {
+      font-size: 12px;
+      color: #b8bfd2;
+      margin-bottom: 4px;
+    }
+
+    .message-time {
+      font-size: 10px;
+      color: #9ca3b7;
+      margin-top: 5px;
+    }
+
+    .message-input {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .message-input input {
+      margin: 0;
+    }
+
+    .admin-box {
+      background: linear-gradient(145deg, #270d08, #151016);
+      border: 1px solid #d19a2c;
+    }
+
+    .star {
+      font-size: 32px;
+      cursor: pointer;
+      color: #777;
+    }
+
+    .star.active {
+      color: #ffd000;
+    }
+
+    @media (max-width: 700px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .photo {
+        height: 160px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">🧠 <span>Brainrot</span> Trade</div>
+  <button class="dark" onclick="openAdmin()">🛡️ Admin</button>
+</header>
+
+<main>
+
+  <input
+    id="search"
+    class="search"
+    placeholder="🔎 Rechercher une annonce..."
+    oninput="loadAds()"
+  >
+
+  <div class="buttons">
+    <button onclick="openCreate()">＋ Nouvelle annonce</button>
+  </div>
+
+  <div id="ads">
+    Chargement...
+  </div>
+
+</main>
+
+<nav>
+  <button class="dark" onclick="loadAds()">🏠 Accueil</button>
+  <button onclick="openCreate()">＋ Annonce</button>
+  <button class="dark" onclick="openConversations()">💬 Messages</button>
+</nav>
+
+
+<!-- CRÉATION ANNONCE -->
+
+<div id="createModal" class="modal">
+  <div class="box">
+
+    <h2>➕ Nouvelle annonce</h2>
+
+    <input id="ownerName" placeholder="Ton pseudo">
+
+    <input id="adName" placeholder="Nom du Brainrot">
+
+    <textarea
+      id="adDescription"
+      placeholder="Décris ton annonce..."
+    ></textarea>
+
+    <input
+      id="adWanted"
+      placeholder="Ce que tu recherches..."
+    >
+
+    <p>📸 Photo du téléphone</p>
+
+    <input
+      id="adPhoto"
+      type="file"
+      accept="image/*"
+    >
+
+    <div class="buttons">
+      <button onclick="createAd()">Publier</button>
+      <button class="dark" onclick="closeModal('createModal')">
+        Annuler
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- CHAT -->
+
+<div id="chatModal" class="modal">
+  <div class="box">
+
+    <h2>💬 Discussion</h2>
+
+    <p id="chatStatus" class="muted"></p>
+
+    <div id="messages" class="messages">
+    </div>
+
+    <div class="message-input">
+
+      <input
+        id="messageInput"
+        placeholder="Écris ton message..."
+        onkeydown="handleEnter(event)"
+      >
+
+      <button onclick="sendMessage()">
+        Envoyer
+      </button>
+
+    </div>
+
+    <div class="buttons">
+
+      <button class="gold" onclick="closeChat()">
+        🔒 Clôturer
+      </button>
+
+      <button class="danger" onclick="reportCurrentChat()">
+        🚨 Signaler
+      </button>
+
+      <button class="dark" onclick="closeModal('chatModal')">
+        Fermer
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- NOTE -->
+
+<div id="ratingModal" class="modal">
+  <div class="box">
+
+    <h2>⭐ Noter le trade</h2>
+
+    <p>Comment s'est passé l'échange ?</p>
+
+    <div id="stars">
+      <span class="star" onclick="selectRating(1)">★</span>
+      <span class="star" onclick="selectRating(2)">★</span>
+      <span class="star" onclick="selectRating(3)">★</span>
+      <span class="star" onclick="selectRating(4)">★</span>
+      <span class="star" onclick="selectRating(5)">★</span>
+    </div>
+
+    <textarea
+      id="ratingComment"
+      placeholder="Commentaire facultatif..."
+    ></textarea>
+
+    <button onclick="submitRating()">
+      Valider ⭐
+    </button>
+
+  </div>
+</div>
+
+
+<!-- ADMIN -->
+
+<div id="adminModal" class="modal">
+
+  <div class="box admin-box">
+
+    <h2>🛡️ Administration</h2>
+
+    <div id="adminContent">
+      Chargement...
+    </div>
+
+    <button class="dark" onclick="closeModal('adminModal')">
+      Fermer
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+let currentChat = null;
+let currentRating = 0;
+let chatTimer = null;
+let adminCode = null;
+
+
+function $(id) {
+  return document.getElementById(id);
+}
+
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+function openModal(id) {
+  $(id).classList.add("active");
+}
+
+
+function closeModal(id) {
+
+  $(id).classList.remove("active");
+
+  if (id === "chatModal") {
+
+    clearInterval(chatTimer);
+    chatTimer = null;
+
+  }
+
+}
+
+
+function getPlayer() {
+
+  let player = localStorage.getItem("brainrot_player");
+
+  if (!player) {
+
+    player = prompt("Choisis ton pseudo :") || "Joueur";
+
+    localStorage.setItem("brainrot_player", player);
+
+  }
+
+  return player;
+
+}
+
+
+async function api(url, options = {}) {
+
+  const response = await fetch(url, {
+
+    ...options,
+
+    headers: {
+
+      "Content-Type": "application/json",
+
+      ...(options.headers || {})
+
+    }
+
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+
+    throw new Error(data.error || "Une erreur est survenue.");
+
+  }
+
+  return data;
+
+}
+
+
+/* =========================
+   ANNONCES
+========================= */
+
+async function loadAds() {
+
+  try {
+
+    const ads = await api("/api/ads");
+
+    const search = $("search").value.toLowerCase();
+
+    const filtered = ads.filter(ad => {
+
+      return (
+
+        String(ad.name || "").toLowerCase().includes(search) ||
+
+        String(ad.description || "").toLowerCase().includes(search) ||
+
+        String(ad.wanted || "").toLowerCase().includes(search)
+
+      );
+
+    });
+
+
+    if (!filtered.length) {
+
+      $("ads").innerHTML = `
+
+        <div class="card">
+
+          <h2>Aucune annonce</h2>
+
+          <p class="muted">
+            Sois le premier à publier une annonce !
+          </p>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    $("ads").innerHTML = filtered.map(ad => `
+
+      <div class="card">
+
+        <div class="photo">
+
+          ${
+            ad.photoData
+
+              ? `<img src="${ad.photoData}">`
+
+              : "🧠"
+
+          }
+
+        </div>
+
+        <h2>${escapeHtml(ad.name)}</h2>
+
+        <p class="muted">
+
+          👤 ${escapeHtml(ad.ownerName || "Joueur")}
+
+        </p>
+
+        <p>
+
+          ${escapeHtml(ad.description || "")}
+
+        </p>
+
+        <p>
+
+          🔄 Recherche :
+          <b>${escapeHtml(ad.wanted || "")}</b>
+
+        </p>
+
+        ${
+          ad.certified
+            ? `<p class="certified">☑️ Annonce certifiée</p>`
+            : ""
+        }
+
+        <div class="buttons">
+
+          <button onclick="openChat(${ad.id})">
+            💬 Chat
+          </button>
+
+          <button
+            class="danger"
+            onclick="reportAd(${ad.id})"
+          >
+            🚨
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+  }
+
+  catch (error) {
+
+    $("ads").innerHTML = `
+
+      <div class="card">
+
+        <h3>❌ Impossible de charger les annonces</h3>
+
+        <p class="muted">
+          Le serveur n'est probablement pas encore démarré.
+        </p>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+function openCreate() {
+
+  $("ownerName").value = getPlayer();
+
+  openModal("createModal");
+
+}
+
+
+async function createAd() {
+
+  const ownerName = $("ownerName").value.trim();
+
+  const name = $("adName").value.trim();
+
+  const description = $("adDescription").value.trim();
+
+  const wanted = $("adWanted").value.trim();
+
+  const file = $("adPhoto").files[0];
+
+
+  if (!ownerName || !name || !description || !wanted) {
+
+    alert("Remplis tous les champs.");
+
+    return;
+
+  }
+
+
+  let photoData = null;
+
+
+  if (file) {
+
+    photoData = await new Promise(resolve => {
+
+      const reader = new FileReader();
+
+      reader.onload = () => resolve(reader.result);
+
+      reader.readAsDataURL(file);
+
+    });
+
+  }
+
+
+  try {
+
+    await api("/api/ads", {
+
+      method: "POST",
+
+      body: JSON.stringify({
+
+        ownerName,
+
+        name,
+
+        description,
+
+        wanted,
+
+        photoData
+
+      })
+
+    });
+
+
+    $("adName").value = "";
+
+    $("adDescription").value = "";
+
+    $("adWanted").value = "";
+
+    $("adPhoto").value = "";
+
+
+    closeModal("createModal");
+
+    await loadAds();
+
+  }
+
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+/* =========================
+   CHAT
+========================= */
+
+async function openChat(adId) {
+
+  try {
+
+    const chat = await api("/api/chats", {
+
+      method: "POST",
+
+      body: JSON.stringify({
+
+        adId,
+
+        buyerName: getPlayer()
+
+      })
+
+    });
+
+
+    currentChat = chat.id;
+
+    openModal("chatModal");
+
+    await refreshChat();
+
+
+    clearInterval(chatTimer);
+
+    chatTimer = setInterval(refreshChat, 2000);
+
+  }
+
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+async function refreshChat() {
+
+  if (!currentChat) return;
+
+
+  try {
+
+    const data = await api(
+
+      "/api/chats/" + currentChat
+
+    );
+
+
+    $("chatStatus").innerHTML =
+
+      data.chat.status === "closed"
+
+        ? "🔒 Conversation clôturée"
+
+        : "🟢 Conversation ouverte";
+
+
+    $("messageInput").disabled =
+
+      data.chat.status !== "open";
+
+
+    $("messages").innerHTML =
+
+      data.messages.map(message => `
+
+        <div class="message ${
+          message.senderName === getPlayer()
+            ? "mine"
+            : ""
+        }">
+
+          <div class="message-name">
+
+            ${escapeHtml(message.senderName)}
+
+          </div>
+
+          ${escapeHtml(message.text)}
+
+          <div class="message-time">
+
+            ${new Date(
+              message.createdAt
+            ).toLocaleString()}
+
+          </div>
+
+        </div>
+
+      `).join("");
+
+
+    $("messages").scrollTop =
+      $("messages").scrollHeight;
+
+  }
+
+  catch (error) {}
+
+}
+
+
+function handleEnter(event) {
+
+  if (event.key === "Enter") {
+
+    event.preventDefault();
+
+    sendMessage();
+
+  }
+
+}
+
+
+async function sendMessage() {
+
+  const input = $("messageInput");
+
+  const text = input.value.trim();
+
+
+  if (!text || !currentChat) return;
+
+
+  try {
+
+    await api(
+
+      "/api/chats/" + currentChat + "/messages",
+
+      {
+
+        method: "POST",
+
+        body: JSON.stringify({
+
+          senderName: getPlayer(),
+
+          text
+
+        })
+
+      }
+
+    );
+
+
+    input.value = "";
+
+    await refreshChat();
+
+  }
+
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+async function closeChat() {
+
+  if (!currentChat) return;
+
+
+  if (!confirm("Clôturer cette conversation ?")) {
+
+    return;
+
+  }
+
+
+  try {
+
+    await api(
+
+      "/api/chats/" + currentChat + "/close",
+
+      { method: "POST" }
+
+    );
+
+
+    clearInterval(chatTimer);
+
+    chatTimer = null;
+
+    closeModal("chatModal");
+
+    currentRating = 0;
+
+    openModal("ratingModal");
+
+  }
+
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+/* =========================
+   NOTATION
+========================= */
+
+function selectRating(number) {
+
+  currentRating = number;
+
+
+  document
+    .querySelectorAll(".star")
+    .forEach((star, index) => {
+
+      star.classList.toggle(
+        "active",
+        index < number
+      );
+
+    });
+
+}
+
+
+async function submitRating() {
+
+  if (!currentRating) {
+
+    alert("Choisis une note.");
+
+    return;
+
+  }
+
+
+  try {
+
+    await api(
+
+      "/api/chats/" + currentChat + "/rate",
+
+      {
+
+        method: "POST",
+
+        body: JSON.stringify({
+
+          rating: currentRating,
+
+          comment: $("ratingComment").value
+
+        })
+
+      }
+
+    );
+
+
+    $("ratingComment").value = "";
+
+    closeModal("ratingModal");
+
+    alert("Merci pour ta note ⭐");
+
+  }
+
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+/* =========================
+   MESSAGES
+========================= */
+
+async function openConversations() {
+
+  try {
+
+    const conversations = await api(
+
+      "/api/chats?player=" +
+      encodeURIComponent(getPlayer())
+
+    );
+
+
+    let html = "<h2>💬 Mes conversations</h2>";
+
+
+    if (!conversations.length) {
+
+      html += `
+
+        <p class="muted">
+
+          Tu n'as encore aucune conversation.
+
+        </p>
+
+      `;
+
+    }
+
+
+    conversations.forEach(chat => {
+
+      html += `
+
+        <div class="card">
+
+          <h3>${escapeHtml(chat.adName)}</h3>
+
+          <p>
+
+            ${
+              chat.status === "open"
+                ? "🟢 Conversation ouverte"
+                : "🔒 Conversation clôturée"
+            }
+
+          </p>
+
+          ${
+            chat.rating
+              ? `<p>⭐ ${chat.rating}/5</p>`
+              : ""
+          }
+
+          <button onclick="openChat(${chat.id})">
+
+            Ouvrir le chat
+
+          </button>
+
+        </div>
+
+      `;
+
+    });
+
+
+    html += `
+
+      <button
+        class="dark"
+        onclick="closeModal('conversationsModal')"
+      >
+
+        Fermer
+
+      </button>
+
+    `;
+
+
+    let modal = $("conversationsModal");
+
+
+    if (!modal) {
+
+      modal = document.createElement("div");
+
+      modal.id = "conversationsModal";
+
+      modal.className = "modal";
+
+      document.body.appendChild(modal);
+
+    }
+
+
+    modal.innerHTML = `<div class="box">${html}</div>`;
+
+    modal.classList.add("active");
+
+  }
+
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+/* =========================
+   SIGNALEMENTS
+========================= */
+
+async function reportAd(adId) {
+
+  const reason = prompt(
+    "Pourquoi veux-tu signaler cette annonce ?"
+  );
+
+
+  if (!reason) return;
+
+
+  try {
+
+    await api("/api/reports", {
+
+      method: "POST",
+
+      body: JSON.stringify({
+
+        adId,
+
+        reporterName: getPlayer(),
+
+        reason
+
+      })
+
+    });
+
+
+    alert("Signalement envoyé 🚨");
+
+  }
+
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+async function reportCurrentChat() {
+
+  if (!currentChat) return;
+
+
+  const reason = prompt(
+    "Pourquoi veux-tu signaler cette conversation ?"
+  );
+
+
+  if (!reason) return;
+
+
+  try {
+
+    await api("/api/reports", {
+
+      method: "POST",
+
+      body: JSON.stringify({
+
+        chatId: currentChat,
+
+        reporterName: getPlayer(),
+
+        reason
+
+      })
+
+    });
+
+
+    alert("Signalement envoyé 🚨");
+
+  }
+
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+/* =========================
+   ADMIN
+========================= */
+
+function openAdmin() {
+
+  const code = prompt("Code administrateur :");
+
+
+  if (!code) return;
+
+
+  adminCode = code;
+
+  checkAdmin();
+
+}
+
+
+async function checkAdmin() {
+
+  try {
+
+    await api("/api/admin/summary", {
+
+      headers: {
+
+        "x-admin-code": adminCode
+
+      }
+
+    });
+
+
+    openModal("adminModal");
+
+    loadAdmin();
+
+  }
+
+  catch (error) {
+
+    adminCode = null;
+
+    alert("❌ Code admin incorrect.");
+
+  }
+
+}
+
+
+async function loadAdmin() {
+
+  try {
+
+    const [summary, ads, reports] =
+
+      await Promise.all([
+
+        api("/api/admin/summary", {
+
+          headers: {
+            "x-admin-code": adminCode
+          }
+
+        }),
+
+        api("/api/admin/ads", {
+
+          headers: {
+            "x-admin-code": adminCode
+          }
+
+        }),
+
+        api("/api/admin/reports", {
+
+          headers: {
+            "x-admin-code": adminCode
+          }
+
+        })
+
+      ]);
+
+
+    let html = `
+
+      <h3>📊 Statistiques</h3>
+
+      <p>
+
+        📢 ${summary.ads} annonces<br>
+
+        💬 ${summary.chats} conversations<br>
+
+        ✉️ ${summary.messages} messages<br>
+
+        🚨 ${summary.reports} signalements
+
+      </p>
+
+      <h3>📢 Annonces</h3>
+
+    `;
+
+
+    ads.forEach(ad => {
+
+      html += `
+
+        <div class="card">
+
+          <b>${escapeHtml(ad.name)}</b>
+
+          <p>${escapeHtml(ad.ownerName)}</p>
+
+          <div class="buttons">
+
+            ${
+              ad.certified
+
+                ? `<span class="certified">
+                    ☑️ Certifiée
+                   </span>`
+
+                : `<button
+                    class="gold"
+                    onclick="certifyAd(${ad.id})"
+                  >
+                    ☑️ Certifier
+                   </button>`
+            }
+
+
+            ${
+              !ad.deleted
+
+                ? `<button
+                    class="danger"
+                    onclick="deleteAd(${ad.id})"
+                  >
+                    🗑️ Supprimer
+                   </button>`
+
+                : "🗑️ Supprimée"
+            }
+
+          </div>
+
+        </div>
+
+      `;
+
+    });
+
+
+    html += "<h3>🚨 Signalements</h3>";
+
+
+    reports.forEach(report => {
+
+      html += `
+
+        <div class="card">
+
+          <b>${escapeHtml(report.reporterName)}</b>
+
+          <p>${escapeHtml(report.reason)}</p>
+
+        </div>
+
+      `;
+
+    });
+
+
+    $("adminContent").innerHTML = html;
+
+  }
+
+  catch (error) {
+
+    $("adminContent").innerHTML =
+
+      "<p>Impossible de charger l'administration.</p>";
+
+  }
+
+}
+
+
+async function certifyAd(id) {
+
+  await api(
+
+    "/api/admin/ads/" + id + "/certify",
+
+    {
+
+      method: "POST",
+
+      headers: {
+
+        "x-admin-code": adminCode
+
+      }
+
+    }
+
+  );
+
+
+  await loadAdmin();
+
+  await loadAds();
+
+}
+
+
+async function deleteAd(id) {
+
+  if (!confirm("Supprimer cette annonce ?")) {
+
+    return;
+
+  }
+
+
+  await api(
+
+    "/api/admin/ads/" + id,
+
+    {
+
+      method: "DELETE",
+
+      headers: {
+
+        "x-admin-code": adminCode
+
+      }
+
+    }
+
+  );
+
+
+  await loadAdmin();
+
+  await loadAds();
+
+}
+
+
+/* =========================
+   DÉMARRAGE
+========================= */
+
+loadAds();
+
+</script>
+
+</body>
+    </html>
